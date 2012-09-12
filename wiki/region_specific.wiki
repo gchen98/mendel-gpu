@@ -6,17 +6,17 @@ In this tutorial we describe how one can quickly impute missing genotypes using 
 
 We have included some utilities to convert files in standard formats (e.g. PLINK, MENDEL, VCF) into native formats.  You can run these utilities from a directory that contains sample input files.  These are located at $IMPUTATION_HOME/examples/rawinput where $IMPUTATION_HOME is the location of the installation.  In this directory you will find files extracted from real data of Chr 22 from the KGP.  The files are described below:
 
-= REFERENCE HAPLOTYPE FILES =
+= Reference haplotypes =
 
 kgp.haplotypes:
 
-This contains phased haplotypes with alleles 0 and 1.  The rows are SNPs, and columns are haplotypes (2 * individuals).  There are 1092 individuals and 70 SNPs in this example.
+This contains phased haplotypes with alleles 0 and 1.  The rows are SNPs, and columns are haplotypes.  There are 1092 individuals and 70 SNPs in this example.
 
 kgp.legend:
 
 This is meta data describing the SNPs.
 
-= FILES DERIVED FROM GWAS CHIP STUDY =
+= Data from GWAS chip =
 
 study.bim and study.def:
 
@@ -34,7 +34,7 @@ study.bed
 
 This is a binary file that stores genotypes at the bit level.  More information can be found at the PLINK website.
 
-= FILES DERIVED FROM GWAS LOW-PASS SEQUENCING STUDY =
+= Low-coverage resequencing study =
 
 chr22.vcf.gz:
 
