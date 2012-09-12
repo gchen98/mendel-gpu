@@ -35,6 +35,7 @@ For PLINK compliant format (.fam): Ped ID, Indiv ID, Father ID, Mother ID, Sex (
 For MENDEL compliant format (.ped): Ped ID, Indiv ID, Father ID, Mother ID, Sex (1=male,2=female), Affection (-9=unknown)
 
 * Usage from MENDEL format input: _prep_swiftgpu_input.sh 22 kgp.legend kgp.haplotypes mendel study_
+
 * Usage from PLINK format input: _prep_swiftgpu_input.sh 22 kgp.legend kgp.haplotypes plink study_
 
 = Low-coverage resequencing study =
