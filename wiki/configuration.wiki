@@ -2,22 +2,31 @@
 
 = Introduction =
 
-Mendel-GPU includes many utilities that facilitate whole-genome imputation using 1000 Genomes Project (KGP_ data.  However, you will need to have a mysql server installed either on the analysis machine or a remote machine.  This will contain the positions of the SNP IDs and their positions according the KGP.
+Mendel-GPU includes many utilities that facilitate whole-genome imputation using 1000 Genomes Project (KGP) data.  However, you will need to have a mysql server installed either on the analysis machine or a remote machine.  This will contain the positions of the SNP IDs and their positions according the KGP.
 
 = Environment variables =
 
 You will need to set a few environment variables in your startup script under your home directory.  Below is an excerpt from my .bash_profile startup script.
 
 export IMPUTATION_SOFTWARE=/home/garykche/gary/code/haplotyping/google/swift-gpu
+
 export IMPUTATION_DATA=/scratch/swift-gpu
-export DBHOST=sailfish.usc.edu
-export DBUSER=garyc
-export DBPW=mypassword
-export MASTERDB=genome_builds
-export MASTERTABLE=grch37_unique
+
 export KGP_DIR=$IMPUTATION_DATA'/kgp_v3'
 
+export DBHOST=sailfish.usc.edu
+
+export DBUSER=garyc
+
+export DBPW=mypassword
+
+export MASTERDB=genome_builds
+
+export MASTERTABLE=grch37_unique
+
 The first two variables are somewhat straightforward.  The former variable defines where you installed the program, and the latter variable defines where you plan for the imputation data to reside.
+
+The third variable defines where to find the KGP legend and haplotype files.  You can download these from the IMPUTE2 website, and save them in $KGP_DIR.
 
 The remaining variables inform scripts as to where to find data from the mysql database.  In our case, the database server is at host sailfish.usc.edu, the username with read access to all tables is garyc, and his password is mypassword.  The MASTERDB and MASTERTABLE refer to the name of the database and the table that KGP SNP IDs are located in for the purpose of sorting study genotype data in position order.
 
@@ -44,4 +53,3 @@ rs102     1    100402
 ...
 
 Please refer to the MySQL documentation for more details on this syntax.
-
