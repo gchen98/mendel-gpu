@@ -33,13 +33,8 @@ The remaining variables inform scripts as to where to find data from the mysql d
 You can create MASTERTABLE by using the script below:
 
 use MASTERDB
-CREATE TABLE `MASTERTABLE` (
-  `rsnumber` varchar(32) NOT NULL default '',
-  `chrom` varchar(2) default NULL,
-  `position` int(11) default NULL,
-  PRIMARY KEY  (`rsnumber`),
-  KEY `chrom` (`chrom`,`position`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `MASTERTABLE` (  `rsnumber` varchar(32) NOT NULL default '',  `chrom` varchar(2) default NULL, `position` int(11) default NULL, PRIMARY KEY  (`rsnumber`), KEY `chrom` (`chrom`,`position`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 where you replace MASTERDB and MASTERTABLE with their respective values.
 
