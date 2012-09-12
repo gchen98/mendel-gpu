@@ -30,6 +30,8 @@ The third variable defines where to find the KGP legend and haplotype files.  Yo
 
 The remaining variables inform scripts as to where to find data from the mysql database.  In our case, the database server is at host sailfish.usc.edu, the username with read access to all tables is garyc, and his password is mypassword.  The MASTERDB and MASTERTABLE refer to the name of the database and the table that KGP SNP IDs are located in for the purpose of sorting study genotype data in position order.
 
+= Initializing the database =
+
 You can create MASTERTABLE by using the script below:
 
 use MASTERDB
