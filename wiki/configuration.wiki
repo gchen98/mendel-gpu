@@ -8,21 +8,16 @@ Mendel-GPU includes many utilities that facilitate whole-genome imputation using
 
 You will need to set a few environment variables in your startup script under your home directory.  Below is an excerpt from my .bash_profile startup script.
 
+{{{
 export IMPUTATION_SOFTWARE=/home/garykche/gary/code/haplotyping/google/swift-gpu
-
 export IMPUTATION_DATA=/scratch/swift-gpu
-
 export KGP_DIR=$IMPUTATION_DATA'/kgp_v3'
-
 export DBHOST=sailfish.usc.edu
-
 export DBUSER=garyc
-
 export DBPW=mypassword
-
 export MASTERDB=genome_builds
-
 export MASTERTABLE=grch37_unique
+}}}
 
 The first two variables are somewhat straightforward.  The former variable defines where you installed the program, and the latter variable defines where you plan for the imputation data to reside.
 
@@ -30,13 +25,15 @@ The third variable defines where to find the KGP legend and haplotype files.  Yo
 
 The remaining variables inform scripts as to where to find data from the mysql database.  In our case, the database server is at host sailfish.usc.edu, the username with read access to all tables is garyc, and his password is mypassword.  The MASTERDB and MASTERTABLE refer to the name of the database and the table that KGP SNP IDs are located in for the purpose of sorting study genotype data in position order.
 
-= Initializing the database =
+= Initializing the KGP database =
 
 You can create MASTERTABLE by using the script below:
 
+{{{
 use MASTERDB
 
 CREATE TABLE `MASTERTABLE` (  `rsnumber` varchar(32) NOT NULL default '',  `chrom` varchar(2) default NULL, `position` int(11) default NULL, PRIMARY KEY  (`rsnumber`), KEY `chrom` (`chrom`,`position`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+}}}
 
 where you replace MASTERDB and MASTERTABLE with their respective values.
 
@@ -45,8 +42,65 @@ You will want to load the values of the KGP SNPs and their positions into MASTER
 LOAD DATA INFILE '/home/garyc/kgp_snps.txt' into table MASTERTABLE;
 
 where kgp_snps.txt is tab delimited with rows looking like:
+{{{
 rs100     1    100312
 rs102     1    100402
 ...
+}}}
 
 Please refer to the MySQL documentation for more details on this syntax.
+
+= Initializing the study database =
+
+Create a sample list
+
+{{{
+CREATE TABLE `person` (
+  `seq` mediumint unsigned NOT NULL default '0',
+  `id` varchar(100) default NULL,
+  `sex` char(1) default NULL,
+  `perm` mediumint(8) unsigned default NULL,
+  PRIMARY KEY  (`seq`),
+  KEY `index_perm` (`perm`)
+)
+}}}
+
+Below is an excerpt of example data:
+
+{{{
+mysql> select * from person limit 5;
++-----+---------+------+------+
+| seq | id      | sex  | perm |
++-----+---------+------+------+
+|   0 | 5112641 | F    |  837 | 
+|   1 | 5117125 | F    | 4197 | 
+|   2 | 5117343 | F    | 1486 | 
+|   3 | 5118531 | F    |  151 | 
+|   4 | 5119660 | F    | 2415 | 
++-----+---------+------+------+
+5 rows in set (0.05 sec)
+
+mysql> 
+}}}
+
+The perm column simply allows MENDEL-GPU to permute the order of the samples when chunking up data across subjects.  This can reduce the possibility of batch effects.  The lowest value for perm must be zero and the highest value is N-1 where N is the sample size.  It is optional and you can simply copy seq into perm if you wish.
+
+Create the genotype table
+
+{{{
+CREATE TABLE `genotype` (
+  `rs` varchar(20) NOT NULL default '',
+  `vector` mediumtext,
+  PRIMARY KEY  (`rs`)
+) ENGINE=MyISAM
+}}}
+
+A tab delimited text file that you could import into genotype would look something like
+
+{{{
+rs10231 03123
+}}}
+
+We define missing genotype as 0, homozygous reference (allele corresponding to reference genome allele) genotype as 1, hetero genotype as 2, and homozygous other (other allele) genotype as 3.
+
+Here we only import one SNP, where the 0-th (first) person (ID 5112641) has missing genotype, and 4-th (fifth) person (5119660) has homozygous other genotype.
