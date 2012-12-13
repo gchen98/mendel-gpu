@@ -32,7 +32,12 @@ You can create MASTERTABLE by using the script below:
 {{{
 use MASTERDB
 
-CREATE TABLE `MASTERTABLE` (  `rsnumber` varchar(32) NOT NULL default '',  `chrom` varchar(2) default NULL, `position` int(11) default NULL, PRIMARY KEY  (`rsnumber`), KEY `chrom` (`chrom`,`position`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE `MASTERTABLE` (  
+`rsnumber` varchar(32) NOT NULL default '',  
+`chrom` varchar(2) default NULL, 
+`position` int(11) default NULL, 
+PRIMARY KEY  (`rsnumber`), 
+KEY `chrom` (`chrom`,`position`));
 }}}
 
 where you replace MASTERDB and MASTERTABLE with their respective values.
@@ -52,7 +57,14 @@ Please refer to the MySQL documentation for more details on this syntax.
 
 = Initializing the study database =
 
-Create a sample list
+Suppose we have a study called mystudy.  We will create a database called mystudy:
+
+{{{
+CREATE DATABASE mystudy;
+USE mystudy;
+}}}
+
+Now we need to create two tables that Mendel-GPU will read, in order to chunk up data for whole genome imputation.  First, create a sample list:
 
 {{{
 CREATE TABLE `person` (
@@ -85,7 +97,7 @@ mysql>
 
 The perm column simply allows MENDEL-GPU to permute the order of the samples when chunking up data across subjects.  This can reduce the possibility of batch effects.  The lowest value for perm must be zero and the highest value is N-1 where N is the sample size.  It is optional and you can simply copy seq into perm if you wish.
 
-Create the genotype table
+The second table contains all the genotypes.  Create the genotype table as:
 
 {{{
 CREATE TABLE `genotype` (
@@ -101,6 +113,8 @@ A tab delimited text file that you could import into genotype would look somethi
 rs10231 03123
 }}}
 
-We define missing genotype as 0, homozygous reference (allele corresponding to reference genome allele) genotype as 1, hetero genotype as 2, and homozygous other (other allele) genotype as 3.
+In reality, the second column as many more characters (thousands), each character representing the genotype of the ordered individuals, ordered by the sequence defined in the person table.  We define missing genotype as 0, homozygous reference (allele corresponding to reference genome allele) genotype as 1, hetero genotype as 2, and homozygous other (other allele) genotype as 3.
 
 Here we only import one SNP, where the 0-th (first) person (ID 5112641) has missing genotype, and 4-th (fifth) person (5119660) has homozygous other genotype.
+
+Please visit the whole-genome Wiki page for more information on how to do large scale phasing, and imputation.
