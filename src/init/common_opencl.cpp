@@ -31,6 +31,10 @@ void MendelGPU::init_opencl(){
     " and device id "<<device_id<<".\n";
     vector<cl::Platform> platforms;
     err = cl::Platform::get(&platforms);
+    if (err != CL_SUCCESS) {
+      cerr << "Error: Failed to initialize the GPU.\n";
+      exit(1);
+    }
     cerr<<"Platform ID "<<platform_id<<" has name "<<
     platforms[platform_id].getInfo<CL_PLATFORM_NAME>().c_str()<<endl;
     cl_context_properties cps[3] = {CL_CONTEXT_PLATFORM,
