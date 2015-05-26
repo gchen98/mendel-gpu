@@ -27,6 +27,7 @@
 <use_cpu>1</use_cpu> 
 <tuning_parameters>
   <total_regions>1</total_regions> <!--increase if memory is a concern-->
+  <total_best_haps>32</total_best_haps>
   <flanking_snps>3</flanking_snps>
   <max_haplotypes>16</max_haplotypes>
   <delta>1e-4</delta>
