@@ -13,6 +13,13 @@ using namespace std;
 
 #include"io_manager.hpp"
 
+static void checkSetting(string filename, string filetype) {
+  if (filename.empty()) {
+    cerr << "Error: " << filetype << " not specified in the settings file.\n";
+    exit(1);
+  }
+}
+
 void checkOpen(const char * filename, ifstream & ifs){
   if (!ifs.is_open()){
     cerr<<"Cannot open "<<filename<<endl;
@@ -123,19 +130,27 @@ bool IO_manager::load_config(const char * xmlfile){
     if (config->inputformat.compare("plink")==0){
       config->g_likelihood_mode = Config::LIKELIHOOD_MODE_GENOTYPES;
       config->famfile = pt.get<string>("plink_settings.famfile");
+      checkSetting(config->famfile, "famfile");
       config->bimfile = pt.get<string>("plink_settings.bimfile");
+      checkSetting(config->bimfile, "bimfile");
       config->bedfile = pt.get<string>("plink_settings.bedfile");
+      checkSetting(config->bedfile, "bedfile");
     }else if (config->inputformat.compare("glf")==0){
       config->g_likelihood_mode = Config::LIKELIHOOD_MODE_GENOTYPES;
       config->famfile = pt.get<string>("glf_settings.famfile");
+      checkSetting(config->famfile, "famfile");
       config->bimfile = pt.get<string>("glf_settings.bimfile");
+      checkSetting(config->bimfile, "bimfile");
       config->is_phased = pt.get<bool>("glf_settings.phased_input");
       config->glf = pt.get<string>("glf_settings.glf");
     }else if (config->inputformat.compare("bam")==0){
       config->g_likelihood_mode = Config::LIKELIHOOD_MODE_READS;
       config->famfile = pt.get<string>("bam_settings.famfile");
+      checkSetting(config->famfile, "famfile");
       config->bimfile = pt.get<string>("bam_settings.bimfile");
+      checkSetting(config->bimfile, "bimfile");
       config->bamfile = pt.get<string>("bam_settings.bamfile");
+      checkSetting(config->bamfile, "bamfile");
     }else{
       throw "Invalid input type.  Valid values are plink, glf, bam.";
     }
