@@ -519,7 +519,7 @@ void ReadParser::make_partial_pileup(int lastpos,int currentpos,int offset,pileu
 }
 
 void ReadParser::extract_region(int subject,int offset,int snps,bool populate_matrix){
-  bool debug = subject==test_subject;
+  bool debug_test_subject = subject==test_subject;
   ostringstream oss_subject;
   oss_subject<<subject;
   string subject_str = oss_subject.str();
@@ -543,29 +543,35 @@ void ReadParser::extract_region(int subject,int offset,int snps,bool populate_ma
     if (snpindex==offset && populate_matrix){
       // If at the first column, we need to extract reads that begin
       // left of the matrix
-      if(subject==test_subject) cerr<<"Checking for pileups overlapping left edge\n";
+      if (debug_test_subject)
+        cerr << "Checking for pileups overlapping left edge\n";
       int p=0;
       for(pileup_multimap_t::iterator it = partial_pileup_map.lower_bound(key);
       it!=partial_pileup_map.upper_bound(key);it++){
-       if(subject==test_subject) cerr<<"Found an overlapping pileup: "<<p<<"\n";
+       if (debug_test_subject)
+         cerr << "Found an overlapping pileup: " << p << "\n";
        pileup_val_t partial_val= it->second;
        process_region(it->first,partial_val,this);
        ++p;
       }
     }
 
-    if(subject==test_subject)cerr<<"Querying internal pileups in cache for subject "<<key.subject<<" and snpindex "<<snpindex<<" which has pos "<<key.querypos<<endl;
+    if (debug_test_subject)
+      cerr << "Querying internal pileups in cache for subject " << key.subject
+           << " and snpindex " << snpindex
+           << " which has pos " << key.querypos << endl;
     pileup_map_t::iterator it = pileup_map.find(key);
     if (it!=pileup_map.end()){
       // first attempt to fetch from memory
       pileups_found = true;
       pileup_key_t foundkey = it->first;
-      if(subject==test_subject )cerr<<"Found cached pileup\n";
+      if (debug_test_subject) cerr << "Found cached pileup\n";
       pileup_val_t foundval = it->second;
       process_region(foundkey,foundval,this);
       lastfound_snpindex = snpindex;
     }else if(untyped_pileup_set.find(key)!=untyped_pileup_set.end()){
-      if(debug) cerr<<"Was not found in samtools, will not attempt again\n";
+      if (debug_test_subject)
+        cerr << "Was not found in samtools, will not attempt again\n";
     }else{
       //if memory fetch fails fetch from disk
       //if (untyped_pileup_set.find(key)==untyped_pileup_set.end()){
@@ -574,7 +580,7 @@ void ReadParser::extract_region(int subject,int offset,int snps,bool populate_ma
       //int ref;
       // extract the region next from BAM file
       int ref;
-      if(subject==test_subject)cerr<<"Cache miss, samtool querying region: "<<region<<endl;
+      cerr << "Cache miss, samtool querying region: " << region << endl;
       bam_parse_region(tmp->in->header, region, &ref,
         &tmp->beg, &tmp->end); // parse the region
       if (ref < 0) {
@@ -588,59 +594,82 @@ void ReadParser::extract_region(int subject,int offset,int snps,bool populate_ma
       //bam_plbuf_destroy(buf);
       //if (use_cache){
       if(pileup_map.find(key)==pileup_map.end()){
-        if(subject==test_subject)cerr<<"No pileups were loaded for subject "<<key.subject<<", position "<<key.querypos<<".\n";
+        if (debug_test_subject)
+          cerr << "No pileups were loaded for subject " << key.subject
+               << ", position " << key.querypos << ".\n";
         untyped_pileup_set.insert(key);
       }else{
         // pileups were found for snpindex
         pileups_found = true;
-        if(subject==test_subject)cerr<<"Pileups successfully loaded into cache for subject "<<key.subject<<", position "<<key.querypos<<". Marking last loaded snp index as "<<snpindex<<endl;
+        if (debug_test_subject)
+          cerr << "Pileups successfully loaded into cache for subject " << key.subject
+               << ", position " << key.querypos
+               << ". Marking last loaded snp index as " << snpindex << endl;
         lastfound_snpindex = snpindex;
       }
     }
     ++cursor;
     ++tmp->cursor;
-    if(subject==test_subject ) cerr<<"Matrix row,col is now "<<matrix_rows<<","<<cursor<<endl;
+    if (debug_test_subject)
+      cerr << "Matrix row,col is now " << matrix_rows << "," << cursor << endl;
   }
   if (populate_matrix){
-    cerr<<" clear out things from "<<last_left_marker<<" onwards to "<<offset<<"\n";
+    if (debug_test_subject)
+      cerr << " clear out things from " << last_left_marker
+           << " onwards to " << offset << "\n";
     for(int snpindex=last_left_marker;snpindex<offset;++snpindex){
       //cerr<<"In deleter of subject "<<subject<<" and snpindex "<<snpindex<<"\n";
       pileup_key_t key;
       key.subject = subject_str;
       key.querypos = position_vec[snpindex];
       if (pileup_map.find(key)!=pileup_map.end()){
-        if(subject==test_subject)cerr<<"For internal pileups deleting in cache subject "<<key.subject<<" and pos "<<key.querypos<<endl;
+        if (debug_test_subject)
+          cerr << "For internal pileups deleting in cache subject "
+               << key.subject << " and pos " << key.querypos << endl;
         pileup_map.erase(pileup_map.find(key));
       }
       if (untyped_pileup_set.find(key)!=untyped_pileup_set.end()){
-        if(subject==test_subject)cerr<<"For untyped pileups deleting in cache subject "<<key.subject<<" and pos "<<key.querypos<<endl;
+        if (debug_test_subject)
+          cerr << "For untyped pileups deleting in cache subject "
+               << key.subject << " and pos " << key.querypos << endl;
         untyped_pileup_set.erase(untyped_pileup_set.find(key));
       }
       //pileup_map_t::iterator it = pileup_map.find(key);
       //if (it!=pileup_map.end()){
-       // if(subject==test_subject)cerr<<"For full pileups deleting subject "<<key.subject<<" and pos "<<key.querypos<<endl;
+       // if(debug_test_subject)cerr<<"For full pileups deleting subject "<<key.subject<<" and pos "<<key.querypos<<endl;
         //pileup_map.erase(it);
       //}
       if (partial_pileup_map.lower_bound(key)!=partial_pileup_map.upper_bound(key)){
-        if (subject==test_subject) cerr<<"For overlapping pileups deleting in cache subject "<<key.subject<<" and pos "<<key.querypos<<endl;
+        if (debug_test_subject)
+          cerr << "For overlapping pileups deleting in cache subject "
+               << key.subject << " and pos " << key.querypos << endl;
         partial_pileup_map.erase(partial_pileup_map.lower_bound(key),partial_pileup_map.upper_bound(key));
       }
 
       // sanity check
       if (snpindex==-10){
-        if (subject==test_subject) cerr<<"At "<<snpindex<<" SANITY CHECK for subject "<<subject<<endl;
+        if (debug_test_subject)
+          cerr << "At " << snpindex << " SANITY CHECK for subject "
+               << subject << endl;
         for(int i=0;i<snpindex;++i){
           pileup_key_t testkey = key;
           testkey.querypos = position_vec[i];
           if (pileup_map.find(testkey)!=pileup_map.end()){
-            if (subject==test_subject) cerr<<"Existing pileup found at snp, position "<<snpindex<<","<<position_vec[i]<<endl;
+            if (debug_test_subject)
+              cerr << "Existing pileup found at snp, position " << snpindex
+                   << "," << position_vec[i] << endl;
           }
           if (partial_pileup_map.find(testkey)!=partial_pileup_map.end()){
-            if (subject==test_subject) cerr<<"Using find, Existing partial pileup found at snp, position "<<snpindex<<","<<position_vec[i]<<endl;
+            if (debug_test_subject)
+              cerr << "Using find, Existing partial pileup found at snp, position "
+                   <<snpindex << "," <<position_vec[i] << endl;
           }
           if (partial_pileup_map.lower_bound(testkey)!=partial_pileup_map.upper_bound(key)){
             pileup_key_t found_key = partial_pileup_map.lower_bound(testkey)->first;
-            if (subject==test_subject) cerr<<"Using lowerupper bound, Existing partial pileup found at snp, position "<<i<<","<<position_vec[i]<<" key subject,querypos: "<<found_key.subject<<","<<found_key.querypos<<endl;
+            if (debug_test_subject)
+              cerr << "Using lowerupper bound, Existing partial pileup found at snp, position "
+                   << i << "," << position_vec[i] << " key subject,querypos: "
+                   << found_key.subject << "," << found_key.querypos << endl;
           }
         }
       }
