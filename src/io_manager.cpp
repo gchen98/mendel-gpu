@@ -436,6 +436,7 @@ void IO_manager::parse_plink(const char * famfile,const char * bimfile, const ch
   string chr_arr[study_snps];
   int tagsnp_indices[study_snps];
   int j=0,tagsnps=0;
+  bool debug = config->debug;
   while(getline(ifs_bim,bim_line)){
     string snpid,morgan,a1,a2;
     int position;
@@ -540,7 +541,9 @@ void IO_manager::parse_plink(const char * famfile,const char * bimfile, const ch
     int position = *it;
     if (config->use_reference_panel)informative_snp[j] = true;
     if (genotype_map.find(position)==genotype_map.end()){
-      cerr<<"Will impute position "<<position<<" at index "<<j<<endl;
+      if (debug)
+        cerr << "Will impute position " << position
+             << " at index " << j << endl;
       genotype_map[position] = oss_geno.str();
       if (config->use_reference_panel) informative_snp[j] = false;
     }
@@ -560,6 +563,7 @@ void IO_manager::parse_glf(const char * famfile,const char * bimfile, bool is_ph
   ifstream ifs_glf(glf);
   string line_bim,line_glf;
   string chr_arr[study_snps];
+  bool debug = config->debug;
   for(int j=0;j<study_snps;++j){
     getline(ifs_bim,line_bim);
     getline(ifs_glf,line_glf); 
@@ -598,7 +602,7 @@ void IO_manager::parse_glf(const char * famfile,const char * bimfile, bool is_ph
     int position = *it;
     if (config->use_reference_panel) informative_snp[j] = true;
     if (penetrance_map.find(position)==penetrance_map.end()){
-      cerr<<"Will impute position "<<position<<endl;
+      if (debug) cerr << "Will impute position " << position << endl;
       vector<float> pen_vec;
       for(int i=0;i<persons;++i){
         for(int k=0;k<geno_dim;++k){
@@ -621,6 +625,7 @@ void IO_manager::load_bam_settings(const char * famfile, const char * polymorphi
   }
   string line;
   set<int> variant_pos_set;
+  bool debug = config->debug;
   while(getline(ifs_poly,line)){
     istringstream iss_bim(line);
     string token;
@@ -638,7 +643,9 @@ void IO_manager::load_bam_settings(const char * famfile, const char * polymorphi
     int position = *it;
     if (config->use_reference_panel)informative_snp[j] = true;
     if (variant_pos_set.find(position)==variant_pos_set.end()){
-      cerr<<"Will impute position "<<position<<" at index "<<j<<endl;
+      if (debug)
+        cerr << "Will impute position " << position
+             << " at index " << j << endl;
       if (config->use_reference_panel) informative_snp[j] = false;
     }
     ++j;
