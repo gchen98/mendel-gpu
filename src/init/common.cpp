@@ -65,6 +65,10 @@ void MendelGPU::allocate_memory(){
   debug_opencl = true;
   // this will provide the base path for the kernels
   imputation_software = getenv("IMPUTATION_SOFTWARE");
+  if (!imputation_software) {
+    cerr << "Error: IMPUTATION_SOFTWARE environmental variable not set.\n";
+    exit(1);
+  }
   cerr<<"Software base path is at "<<imputation_software<<endl;
   run_gpu = config->use_gpu;
   run_cpu = config->use_cpu;
