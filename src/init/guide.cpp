@@ -139,6 +139,7 @@ void GuidedMendelGPU::parse_ref_haplotype(){
 
 void GuidedMendelGPU::copy_ref_haplotypes(int left_marker){
   bool debug_haplotype = false;
+  bool debug = config->debug;
   int marker_len = g_markers;
   // save the original # of markers from MENDEL
   extended_markers = marker_len;
@@ -251,7 +252,9 @@ void GuidedMendelGPU::copy_ref_haplotypes(int left_marker){
       hapstrarr[compact_haplotypes] = hapobj.hapstr;
       countarr[compact_haplotypes] = hapobj.hapcount;
       totalcounts+= hapobj.hapcount;
-      cerr<<"Considering "<<hapobj.hapstr<<" count: "<<hapobj.hapcount<<" with order "<<original_hap_order[hapobj.hapstr]<<endl;
+      if (debug)
+        cerr << "Considering " << hapobj.hapstr << " count: " << hapobj.hapcount
+             << " with order " << original_hap_order[hapobj.hapstr] << endl;
       for(set<string>::iterator it=hapobj.extended_set.begin();
       it!=hapobj.extended_set.end();it++){
         if(debug_haplotype) cerr<<" extended: "<<*it<<endl;
