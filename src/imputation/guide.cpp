@@ -162,8 +162,8 @@ void GuidedMendelGPU::impute_genotypes_guide(){
     }
   }//END CPU VERSION
   cerr<<"done impute_geno\n";
-  if (debug_posterior|| debug_dosage||debug_geno) exit(1);
-  if (debug_pen) {
+  if (debug_posterior || debug_dosage || debug_geno || debug_pen) {
+    cerr << "Early stop due to one of debug_posterior, debug_dosage, debug_geno or debug_pen\n";
     exit(1);
   }
 }
