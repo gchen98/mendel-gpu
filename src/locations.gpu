@@ -1,13 +1,18 @@
-PREPROC=-DUSE_GPU
+#PREPROC=-DUSE_GPU
 # this should point to where your OpenCL installation is (below would be things like lib)
 CL_ROOT=/home/garyc/software/ati-stream-sdk-v2.2-lnx64
-SAMTOOLS=/home/garyc/software/samtools-0.1.19
+SAMTOOLS=/home/garyc/software/samtools/samtools-0.1.19
 # 1st arg make sure you see directory CL under include
 # 2nd arg make sure you see directory GL under include 
-CINC_FLAGS=-g -I $(CL_ROOT)/include -I /usr/local/cuda_sdk/shared/inc -I $(SAMTOOLS)
+CINC_FLAGS=-g  -I $(SAMTOOLS)
 FINC_FLAGS=-I ./finclude/
 # 1st arg make sure libOpenCL.so is under lib
-LINK_FLAGS=-g -lgfortran -lOpenCL -lstdc++ -lz
+LINK_FLAGS=-g -lgfortran -lstdc++ -lz -lpthread
+ifeq ($(USE_GPU),1)
+	CINC_FLAGS+=-I $(CL_ROOT)/include -I /usr/local/cuda_sdk/shared/inc
+	LINK_FLAGS+=-lOpenCL
+endif
+
 LINKER=g++
 #LINKER=gfortran
 C_COMPILER=g++

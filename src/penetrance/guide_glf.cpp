@@ -1,3 +1,4 @@
+#include<cstdlib>
 #include"../cl_constants.h"
 #include"../io_manager.hpp"
 #include"../mendel_gpu.hpp"

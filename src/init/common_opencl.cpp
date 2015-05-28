@@ -177,6 +177,7 @@ void MendelGPU::init_opencl(){
 }
 
 void MendelGPU::free_opencl(){
+#ifdef USE_GPU
   delete buffer_haplotype_weight;
   delete buffer_active_haplotype;
   delete buffer_subject_haplotype_weight;
@@ -198,6 +199,7 @@ void MendelGPU::free_opencl(){
   delete program;
   delete commandQueue;
   delete context;
+#endif
 }
 
 void MendelGPU::init_window_opencl(){
