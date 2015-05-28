@@ -141,7 +141,7 @@ bool IO_manager::load_config(const char * xmlfile){
       checkSetting(config->famfile, "famfile");
       config->bimfile = pt.get<string>("glf_settings.bimfile");
       checkSetting(config->bimfile, "bimfile");
-      config->is_phased = pt.get<bool>("glf_settings.phased_input");
+      config->is_phased = pt.get<bool>("glf_settings.phased_input", 0);
       config->glf = pt.get<string>("glf_settings.glf");
     }else if (config->inputformat.compare("bam")==0){
       config->g_likelihood_mode = Config::LIKELIHOOD_MODE_READS;
@@ -154,15 +154,15 @@ bool IO_manager::load_config(const char * xmlfile){
     }else{
       throw "Invalid input type.  Valid values are plink, glf, bam.";
     }
-    config->use_gpu = pt.get<bool>("use_gpu");
-    config->use_cpu = pt.get<bool>("use_cpu");
+    config->use_gpu = pt.get<bool>("use_gpu", 0);
+    config->use_cpu = pt.get<bool>("use_cpu", 1);
     config->total_regions = pt.get<int>("tuning_parameters.total_regions");
     config->flanking_snps = pt.get<int>("tuning_parameters.flanking_snps");
     config->max_haplotypes = pt.get<int>("tuning_parameters.max_haplotypes");
     config->total_best_haps = pt.get<int>("tuning_parameters.total_best_haps");
     config->delta = pt.get<float>("tuning_parameters.delta");
     config->lambda = pt.get<float>("tuning_parameters.lambda");
-    config->debug = pt.get<bool>("tuning_parameters.debug");
+    config->debug = pt.get<bool>("tuning_parameters.debug", 0);
     config->format = pt.get<string>("output_settings.format");
     config->file_posterior = pt.get<string>("output_settings.posterior");
     config->file_genotype = pt.get<string>("output_settings.genotype");
