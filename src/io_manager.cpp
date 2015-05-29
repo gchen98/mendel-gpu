@@ -277,7 +277,6 @@ bool IO_manager::read_input(char * & haplotype_array, float * & snp_penetrance, 
     }else if (config->inputformat.compare("glf")==0){
       parse_glf(config->famfile.data(), config->bimfile.data(),
       config->is_phased,config->glf.data(), informative_snp);
-      //int geno_dim = config->is_phased?4:3;
     }else if (config->inputformat.compare("bam")==0){
       load_bam_settings(config->famfile.data(), 
       config->bimfile.data(),  informative_snp);
@@ -399,7 +398,7 @@ void IO_manager::parse_ref_haplotypes(const char * legendfile, const char * hapf
   string line_legend,line_hap;
   getline(ifs_legend,line_legend); // skip header
   int j = 0;
-  cerr<<"Records loaded:";
+  cerr << "Loading records... ";
   while(getline(ifs_legend,line_legend)){
     istringstream iss_legend(line_legend);
     string rs;
@@ -422,10 +421,10 @@ void IO_manager::parse_ref_haplotypes(const char * legendfile, const char * hapf
       //cerr<<"Added hap pos "<<position<<endl;
       position_vector.push_back(position);
       ++j;
-      if (j%10000==0) cerr<<" "<<j;
+      if (j % 10000 == 0) cerr << j << ", ";
     }
   }
-  cerr<<endl;
+  cerr << j << ", done.\n";
   this->snps = j; 
   ifs_legend.close();
   ifs_hap.close();
