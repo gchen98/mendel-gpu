@@ -3,7 +3,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
 
-AM_CPPFLAGS = -DUSE_GPU
+AM_CPPFLAGS = @USE_GPU@ @OPENCL_INCLUDE@
 
 bin_PROGRAMS = impute
 
@@ -45,7 +45,6 @@ impute_SOURCES = \
 	$(NULL)
 
 impute_LDADD = \
-	-lbam \
-	-lOpenCL \
+	-lbam @OPENCL_LIB@ \
 	-lstdc++ -lz -lpthread \
 	$(NULL)
