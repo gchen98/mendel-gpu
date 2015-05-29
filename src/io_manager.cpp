@@ -164,6 +164,10 @@ bool IO_manager::load_config(const char * xmlfile){
     }
     config->use_gpu = pt.get<bool>("use_gpu", 0);
     config->use_cpu = pt.get<bool>("use_cpu", 1);
+    if (!(config->use_gpu || config->use_cpu)) {
+      cerr << "Error: at least one of use_gpu or use_cpu must be set to 1.\n";
+      exit(1);
+    }
     config->total_regions = pt.get<int>("tuning_parameters.total_regions");
     config->flanking_snps = pt.get<int>("tuning_parameters.flanking_snps");
     config->max_haplotypes = pt.get<int>("tuning_parameters.max_haplotypes");
