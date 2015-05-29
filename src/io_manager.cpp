@@ -198,13 +198,19 @@ bool IO_manager::load_config(const char * xmlfile){
   try{
     if(write_hapfreq){
       ofs_subject_hap_freq_file.open(config->file_subject_hap_freq.data());
+      if (ofs_subject_hap_freq_file.fail()) throw "subject_hap_freq file";
     }
     ofs_posterior_file.open(config->file_posterior.data());
+    if (ofs_posterior_file.fail()) throw "posterior file";
     ofs_genotype_file.open(config->file_genotype.data());
+    if (ofs_genotype_file.fail()) throw "genotype file";
     ofs_dosage_file.open(config->file_dosage.data());
+    if (ofs_dosage_file.fail()) throw "dosage file";
     ofs_quality_file.open(config->file_quality.data());
-  }catch (const exception & e){
-    cerr<<"Caught an exception attempting to open outfiles: "<<e.what()<<"\n";
+    if (ofs_quality_file.fail()) throw "quality file";
+  } catch (const char * msg) {
+    cerr << "Caught an exception attempting to open outfiles: "
+         << msg << " cannot be written.\n";
     return false;
   }
   
