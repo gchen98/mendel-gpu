@@ -44,6 +44,7 @@
 #
 # LICENSE
 #
+#   Copyright (c) 2015 Marco Colombo <m.colombo@ed.ac.uk>
 #   Copyright (c) 2013 Timothy Brown <tbrown@freeshell.org>
 #
 #   This program is free software; you can redistribute it and/or modify it
@@ -72,51 +73,57 @@
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 2
+#serial 3
 
-AC_DEFUN([AX_LIB_SAMTOOLS],
-#
-# Handle user hints
-#
-[AC_MSG_CHECKING([if samtools is wanted])
+AC_DEFUN([AX_LIB_SAMTOOLS], [
+
 AC_ARG_WITH([samtools],
-  AS_HELP_STRING([--with-samtools],
-                 [search for samtools in DIR/include and DIR/lib]),
- [if test "$withval" != no ; then
-   AC_MSG_RESULT([yes])
-   if test -d "$withval" ; then
-     SAMTOOLS_HOME="$withval"
-   else
-     AC_MSG_WARN([Sorry, $withval does not exist, checking usual places])
-   fi
- else
-   AC_MSG_RESULT([no])
- fi],
- [AC_MSG_RESULT([yes])])
+            [AC_HELP_STRING([--with-samtools=<dir>],
+                            [search for samtools below the given directory])],
+            [case $with_samtools in
+                 no) AC_MSG_ERROR([samtools is required for mendel-gpu]) ;;
+                 yes|"") AC_MSG_ERROR([path missing in --with-samtools]) ;;
+                 *) SAMTOOLS_HOME=$with_samtools ;;
+             esac])
 
-if test -f "${SAMTOOLS_HOME}/include/bam/sam.h" ; then
+
+#
+# Locate sam.h below the location specified
+#
+if test x${SAMTOOLS_HOME} != x; then
+    if test -f "${SAMTOOLS_HOME}/include/bam/sam.h" ; then
         SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
         SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-elif test -f "${SAMTOOLS_HOME}/include/sam.h" ; then
+    elif test -f "${SAMTOOLS_HOME}/include/samtools/sam.h" ; then
+        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/samtools"
+        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
+    elif test -f "${SAMTOOLS_HOME}/include/sam.h" ; then
         SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include"
         SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-elif test -f "${SAMTOOLS_HOME}/sam.h" ; then
+    else
         SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}"
         SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}"
-elif test -f "/usr/local/include/bam/sam.h" ; then
-        SAMTOOLS_HOME="/usr/local"
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-else
-        SAMTOOLS_HOME="/usr"
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR=""
+    fi
 fi
 
 #
-# Locate samtools, if wanted
+# If the above failed or the user didn't specify a path, try some other paths
 #
-if test -n "${SAMTOOLS_HOME}" ; then
+if test -z ${SAMTOOLS_INCDIR} ; then
+    if test -f "/usr/local/include/bam/sam.h" ; then
+        SAMTOOLS_HOME="/usr/local"
+    else
+        SAMTOOLS_HOME="/usr"
+    fi
+    SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
+    SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
+    echo "Searching for samtools under $SAMTOOLS_INCDIR and $SAMTOOLS_LIBDIR"
+fi
+
+#
+# Check that the paths we identified include sam.h and libbam.a
+#
+if test -n "${SAMTOOLS_INCDIR}" ; then
 
         SAMTOOLS_OLD_LDFLAGS=$LDFLAGS
         SAMTOOLS_OLD_CPPFLAGS=$LDFLAGS
@@ -125,7 +132,7 @@ if test -n "${SAMTOOLS_HOME}" ; then
         AC_LANG_SAVE
         AC_LANG_C
         AC_CHECK_HEADER([sam.h], [ac_cv_sam_h=yes], [ac_cv_sam_h=no])
-        AC_CHECK_LIB([bam], [sam_open], [ac_cv_libbam=yes], [ac_cv_libbam=no])
+        AC_CHECK_LIB([bam], [sam_open], [ac_cv_libbam=yes], [ac_cv_libbam=no], -lz -lpthread)
         AC_LANG_RESTORE
         if test "$ac_cv_libbam" = "yes" && test "$ac_cv_sam_h" = "yes" ; then
                 #
@@ -142,7 +149,7 @@ if test -n "${SAMTOOLS_HOME}" ; then
                 CPPFLAGS="$SAMTOOLS_OLD_CPPFLAGS"
                 AC_MSG_CHECKING([samtools])
                 AC_MSG_RESULT([failed])
-                AC_MSG_ERROR([either specify a valid samtools installation with --with-samtools=DIR or disable samtools usage with --without-samtools])
+                AC_MSG_ERROR([specify a valid samtools installation path with --with-samtools=DIR])
         fi
 fi
 ])
