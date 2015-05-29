@@ -13,9 +13,14 @@ using namespace std;
 
 #include"io_manager.hpp"
 
-static void checkSetting(string filename, string filetype) {
+static void checkSetting(string filename, string setting) {
   if (filename.empty()) {
-    cerr << "Error: " << filetype << " not specified in the settings file.\n";
+    cerr << "Error: " << setting << " not specified in the settings file.\n";
+    exit(1);
+  }
+  ifstream test(filename.data());
+  if (!test.good()) {
+    cerr << "Error: Cannot open " << filename << ".\n";
     exit(1);
   }
 }
@@ -122,7 +127,9 @@ bool IO_manager::load_config(const char * xmlfile){
     if (config->use_reference_panel){
       config->max_reference_haplotypes = pt.get<int>("reference_panel_settings.max_reference_haplotypes");
       config->legendfile = pt.get<string>("reference_panel_settings.legend");
+      checkSetting(config->legendfile, "legendfile");
       config->refhapfile = pt.get<string>("reference_panel_settings.haplotypes");
+      checkSetting(config->refhapfile, "refhapfile");
     }
 
     config->inputformat = pt.get<string>("input_type");
@@ -143,6 +150,7 @@ bool IO_manager::load_config(const char * xmlfile){
       checkSetting(config->bimfile, "bimfile");
       config->is_phased = pt.get<bool>("glf_settings.phased_input", 0);
       config->glf = pt.get<string>("glf_settings.glf");
+      checkSetting(config->glf, "glf");
     }else if (config->inputformat.compare("bam")==0){
       config->g_likelihood_mode = Config::LIKELIHOOD_MODE_READS;
       config->famfile = pt.get<string>("bam_settings.famfile");
