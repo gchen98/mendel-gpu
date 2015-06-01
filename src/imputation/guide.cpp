@@ -68,8 +68,8 @@ void GuidedMendelGPU::impute_genotypes_guide(){
   int c_snp_start = g_center_snp_start - g_left_marker;
   int c_snp_end = c_snp_start+g_flanking_snps;
   bool debug_dosage = c_snp_start==-50;
-  bool debug_posterior = false;
-  bool debug_pen = false;
+  bool debug_posterior = true;
+  bool debug_pen = true;
   cerr<<"Imputing from "<<c_snp_start<<" to "<<(c_snp_end-1)<<" with offset "<<c_snp_offset<<endl;
   for(int hapindex=0;hapindex<extended_haplotypes;++hapindex){
     compress_extendedhap(hapindex,c_snp_start,c_snp_end,extended_haplotype);
@@ -100,12 +100,10 @@ void GuidedMendelGPU::impute_genotypes_guide(){
               for(int c_snp = c_snp_start;c_snp<c_snp_end; ++c_snp){
                 int packedsite = c_snp - c_snp_start;
                 int current_snp = c_snp_offset + c_snp;
-                int m;
-                if(g_genotype_imputation){
-                  m = (((int)packedextendedhap[j*packedextendedhap_len+(packedsite/32)].octet[(packedsite%32)/8]) >> ((packedsite%32)%8) & 1) + (((int)packedextendedhap[k*packedextendedhap_len+(packedsite/32)].octet[(packedsite%32)/8]) >> ((packedsite%32)%8) & 1) ;
-                }else{
-                  m = 2*(((int)packedextendedhap[j*packedextendedhap_len+(packedsite/32)].octet[(packedsite%32)/8]) >> ((packedsite%32)%8) & 1) + (((int)packedextendedhap[k*packedextendedhap_len+(packedsite/32)].octet[(packedsite%32)/8]) >> ((packedsite%32)%8) & 1) ;
-                }
+                int m = (((int)packedextendedhap[j*packedextendedhap_len+(packedsite/32)].octet[(packedsite%32)/8]) >> ((packedsite%32)%8) & 1) +
+                        (((int)packedextendedhap[k*packedextendedhap_len+(packedsite/32)].octet[(packedsite%32)/8]) >> ((packedsite%32)%8) & 1);
+                if (!g_genotype_imputation)
+                  m = 2 * m;
                 float freq = extended_frequency[j]*extended_frequency[k];
                 if (j!=k) freq*=2;
                 float p = freq*penetrance;
