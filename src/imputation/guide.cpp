@@ -67,7 +67,6 @@ void GuidedMendelGPU::impute_genotypes_guide(){
   int c_snp_offset = g_center_snp_start;
   int c_snp_start = g_center_snp_start - g_left_marker;
   int c_snp_end = c_snp_start+g_flanking_snps;
-  bool debug_geno = false;
   bool debug_dosage = c_snp_start==-50;
   bool debug_posterior = false;
   bool debug_pen = false;
@@ -162,10 +161,10 @@ void GuidedMendelGPU::impute_genotypes_guide(){
       io_manager->writeGenotype(j,genotypes,g_people);
     }
   }//END CPU VERSION
-  cerr<<"done impute_geno\n";
-  if (debug_posterior || debug_dosage || debug_geno || debug_pen) {
-    cerr << "Early stop due to one of debug_posterior, debug_dosage, debug_geno or debug_pen\n";
+  if (debug_posterior || debug_dosage || debug_pen) {
+    cerr << "Stopping for debug_posterior, debug_dosage or debug_pen.\n";
     exit(1);
   }
+  cerr << "done impute_geno\n";
 }
 
