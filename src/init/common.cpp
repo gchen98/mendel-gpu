@@ -64,15 +64,19 @@ void MendelGPU::allocate_memory(){
   gf_logpen_threshold = -10;
   g_lambda=1;
   debug_opencl = true;
-  // this will provide the base path for the kernels
-  imputation_software = getenv("IMPUTATION_SOFTWARE");
-  if (!imputation_software) {
-    cerr << "Error: IMPUTATION_SOFTWARE environmental variable not set.\n";
-    exit(1);
-  }
-  cerr<<"Software base path is at "<<imputation_software<<endl;
   run_gpu = config->use_gpu;
   run_cpu = config->use_cpu;
+#ifdef USE_GPU
+  if (run_gpu) {
+    // this will provide the base path for the kernels
+    imputation_software = getenv("IMPUTATION_SOFTWARE");
+    if (!imputation_software) {
+      cerr << "Error: IMPUTATION_SOFTWARE environmental variable not set.\n";
+      exit(1);
+    }
+    cerr << "Software base path is at " << imputation_software << endl;
+  }
+#endif
   g_flanking_snps = config->flanking_snps;
   g_total_best_haps = config->total_best_haps;
   g_max_window = get_max_window_size();
