@@ -110,9 +110,13 @@ void GuidedMendelGPU::impute_genotypes_guide(){
                 if (j!=k) freq*=2;
                 float p = freq*penetrance;
                 subject_posterior_block[i*g_flanking_snps*4+(packedsite)*4+m]+=p;
-                if (debug_pen) cerr<<"i,j,k,m,pen,freq:"<<i<<","<<j<<","<<k<<","<<m<<","<<penetrance<<","<<freq<<endl;
+                if (debug_pen)
+                  cerr << "Person " << i
+                       << ", hap.pair (" << j << "," << k << "), m: " << m
+                       << ", pen: " << penetrance << ", freq: " << freq << endl;
               }
             }
+            else if (debug_pen) cerr << "Penetrance: " << penetrance << endl;
           }
         }
       }
