@@ -85,7 +85,7 @@ protected:
   float * penetrance_cache;
   float * logpenetrance_cache;
   int * haploid_arr;
-  int g_genotype_imputation;
+  bool g_genotype_imputation;
   float * subject_haplotype_weight;
   float * subject_haplotype_screen;
   float * frequency_cache;

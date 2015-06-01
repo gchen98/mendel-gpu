@@ -81,7 +81,7 @@ void MendelGPU::allocate_memory(){
   g_total_best_haps = config->total_best_haps;
   g_max_window = get_max_window_size();
   cerr<<"max window size is "<<g_max_window<<endl;
-  g_genotype_imputation = config->model==1?1:0;
+  g_genotype_imputation = (config->model == 1) ? true : false;
   g_likelihood_mode = config->g_likelihood_mode;
   g_delta = config->delta;
   geno_dim = config->is_phased?4:3;
