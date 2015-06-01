@@ -68,8 +68,8 @@ void GuidedMendelGPU::impute_genotypes_guide(){
   int c_snp_start = g_center_snp_start - g_left_marker;
   int c_snp_end = c_snp_start+g_flanking_snps;
   bool debug_dosage = c_snp_start==-50;
-  bool debug_posterior = true;
-  bool debug_pen = true;
+  bool debug_posterior = false;
+  bool debug_pen = false;
   cerr<<"Imputing from "<<c_snp_start<<" to "<<(c_snp_end-1)<<" with offset "<<c_snp_offset<<endl;
   for(int hapindex=0;hapindex<extended_haplotypes;++hapindex){
     compress_extendedhap(hapindex,c_snp_start,c_snp_end,extended_haplotype);
